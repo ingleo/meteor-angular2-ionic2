@@ -7,6 +7,7 @@ import { AccountsModule } from 'angular2-meteor-accounts-ui';
 import { AppComponent } from './app.component';
 import { routes, ROUTES_PROVIDERS } from './app.routes'; 
 import { PARTIES_DECLARATIONS } from './parties';
+import { SHARED_DECLARATIONS } from './shared';
 
 import {APP_BASE_HREF} from '@angular/common';
 
@@ -21,7 +22,8 @@ import {APP_BASE_HREF} from '@angular/common';
     ],
     declarations: [
         AppComponent,
-        ...PARTIES_DECLARATIONS
+        ...PARTIES_DECLARATIONS,
+        ...SHARED_DECLARATIONS
     ],
     providers: [
         ...ROUTES_PROVIDERS,

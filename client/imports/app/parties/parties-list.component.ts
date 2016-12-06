@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { MeteorObservable } from 'meteor-rxjs';
+import { InjectUser } from "angular2-meteor-accounts-ui";
 
 import { Parties } from '../../../../both/collections/parties.collection';
 import { Party } from '../../../../both/models/party.model';
@@ -13,10 +14,12 @@ import template from './parties-list.component.html';
     template
 })
 
+@InjectUser('user')
 export class PartiesListComponent implements OnInit, OnDestroy {
 
     parties: Observable<Party[]>;
     partiesSub: Subscription;
+    user: Meteor.User;
 
     constructor() {
     }
@@ -33,6 +36,10 @@ export class PartiesListComponent implements OnInit, OnDestroy {
 
     search(value: string): void {
         this.parties = Parties.find(value ? { location: value } : {}).zone();
+    }
+
+    isOwner(party: Party): boolean {
+        return this.user && this.user._id === party.owner;
     }
 
     //unsubscribe when the component is destroyed

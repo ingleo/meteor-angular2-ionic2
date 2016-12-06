@@ -5,9 +5,13 @@ import { Meteor } from 'meteor/meteor';
 import { MeteorObservable } from 'meteor-rxjs';
 import { CanActivate } from '@angular/router';
 import 'rxjs/add/operator/map';
+import { Observable } from 'rxjs/Observable';
+import { InjectUser } from "angular2-meteor-accounts-ui";
 
 import { Parties } from '../../../../both/collections/parties.collection';
 import { Party } from '../../../../both/models/party.model';
+import { Users } from '../../../../both/collections/users.collection';
+import { User } from '../../../../both/models/user.model';
 
 import template from './party-details.component.html';
 
@@ -16,11 +20,15 @@ import template from './party-details.component.html';
     template
 })
 
+@InjectUser('user')
 export class PartyDetailsComponent implements OnInit, OnDestroy, CanActivate {
     partyId: string;
     paramsSub: Subscription;
     partySub: Subscription;
     party: Party;
+    users: Observable<User>;
+    uninvitedSub: Subscription;
+    user: Meteor.User;
 
     constructor(private route: ActivatedRoute) { }
 
@@ -36,9 +44,33 @@ export class PartyDetailsComponent implements OnInit, OnDestroy, CanActivate {
                 }
 
                 this.partySub = MeteorObservable.subscribe('party', this.partyId).subscribe(() => {
-                    this.party = Parties.findOne(this.partyId);
+                    //autorun method is used for re run every time party change
+                    MeteorObservable.autorun().subscribe(() => {
+                        this.party = Parties.findOne(this.partyId);
+                        this.getUsers(this.party);
+                    });
+                });
+
+                //
+                if (this.uninvitedSub) {
+                    this.uninvitedSub.unsubscribe();
+                }
+
+                this.uninvitedSub = MeteorObservable.subscribe('uninvited', this.partyId).subscribe(() => {
+                    this.getUsers(this.party);
                 });
             });
+    }
+
+    getUsers(party: Party) {
+        if (party) {
+            this.users = Users.find({
+                _id: {
+                    $nin: party.invited || [],
+                    $ne: Meteor.userId()
+                }
+            }).zone();
+        }
     }
 
     saveParty() {
@@ -51,19 +83,53 @@ export class PartyDetailsComponent implements OnInit, OnDestroy, CanActivate {
             $set: {
                 name: this.party.name,
                 description: this.party.description,
-                location: this.party.location
+                location: this.party.location,
+                'public': this.party.public
             }
         });
-    }
-
-    ngOnDestroy() {
-        this.paramsSub.unsubscribe();
-        this.partySub.unsubscribe();
     }
 
     //let activate a route according to de party owner id
     canActivate() {
         const party = Parties.findOne(this.partyId);
         return (party && party.owner == Meteor.userId());
+    }
+
+    invite(user: Meteor.User) {
+        MeteorObservable.call('invite', this.party._id, user._id).subscribe(() => {
+            alert('User successfully invited.');
+        }, (error) => {
+            alert(`Failed to invite due to ${error}`);
+        });
+    }
+
+    reply(rsvp: string) {
+        MeteorObservable.call('reply', this.party._id, rsvp).subscribe(() => {
+            alert('You successfully replied.');
+        }, (error) => {
+            alert(`Failed to reply due to ${error}`);
+        });
+    }
+
+    get isOwner(): boolean {
+        return this.party && this.user && this.user._id === this.party.owner;
+    }
+
+    get isPublic(): boolean {
+        return this.party && this.party.public;
+    }
+
+    get isInvited(): boolean {
+        if (this.party && this.user) {
+            const invited = this.party.invited || [];
+            return invited.indexOf(this.user._id) !== -1;
+        }
+        return false;
+    }
+
+    ngOnDestroy() {
+        this.paramsSub.unsubscribe();
+        this.partySub.unsubscribe();
+        this.uninvitedSub.unsubscribe();
     }
 }

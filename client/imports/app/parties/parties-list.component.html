@@ -1,17 +1,22 @@
 <div>
 
-  <parties-form style="float: left"></parties-form>
+  <parties-form [hidden]="!user" style="float: left"></parties-form>
   <input type="text" #searchtext placeholder="Search by Location">
   <button type="button" (click)="search(searchtext.value)">Search</button>
 
   <login-buttons></login-buttons>
-  
+
   <ul>
     <li *ngFor="let party of parties | async">
       <a [routerLink]="['/party', party._id]"> {{party.name}} </a>
       <p>{{party.description}}</p>
       <p>{{party.location}}</p>
-      <button (click)="removeParty(party)">X</button>
+      <button [hidden]="!isOwner(party)" (click)="removeParty(party)">X</button>
+      <div>
+        Who is coming: Yes - {{party | rsvp:'yes'}} 
+        Maybe - {{party | rsvp:'maybe'}} 
+        No - {{party | rsvp:'no'}}
+      </div>
     </li>
   </ul>
 </div>
