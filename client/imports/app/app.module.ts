@@ -5,11 +5,13 @@ import { RouterModule } from '@angular/router';
 import { AccountsModule } from 'angular2-meteor-accounts-ui';
 
 import { AppComponent } from './app.component';
-import { routes, ROUTES_PROVIDERS } from './app.routes'; 
+import { routes, ROUTES_PROVIDERS } from './app.routes';
 import { PARTIES_DECLARATIONS } from './parties';
 import { SHARED_DECLARATIONS } from './shared';
 
-import {APP_BASE_HREF} from '@angular/common';
+import { APP_BASE_HREF } from '@angular/common';
+import { AgmCoreModule } from 'angular2-google-maps/core';
+import { MaterialModule } from "@angular/material";
 
 @NgModule({
 
@@ -18,7 +20,10 @@ import {APP_BASE_HREF} from '@angular/common';
         FormsModule,
         ReactiveFormsModule,
         RouterModule.forRoot(routes),
-        AccountsModule
+        AccountsModule,
+        AgmCoreModule.forRoot({
+            apiKey: 'AIzaSyAWoBdZHCNh5R-hB5S5ZZ2oeoYyfdDgniA'
+        })
     ],
     declarations: [
         AppComponent,
@@ -27,7 +32,7 @@ import {APP_BASE_HREF} from '@angular/common';
     ],
     providers: [
         ...ROUTES_PROVIDERS,
-        {provide: APP_BASE_HREF, useValue : '/' }
+        { provide: APP_BASE_HREF, useValue: '/' }
     ],
     bootstrap: [
         AppComponent

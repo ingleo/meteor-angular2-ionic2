@@ -8,10 +8,12 @@ import { Parties } from '../../../../both/collections/parties.collection';
 import { Party } from '../../../../both/models/party.model';
 
 import template from './parties-list.component.html';
+import style from './parties-list.component.scss';
 
 @Component({
     selector: 'parties-list',
-    template
+    template,
+    styles: [style]
 })
 
 @InjectUser('user')
@@ -35,7 +37,7 @@ export class PartiesListComponent implements OnInit, OnDestroy {
     }
 
     search(value: string): void {
-        this.parties = Parties.find(value ? { location: value } : {}).zone();
+        this.parties = Parties.find(value ? { location:{name: value} } : {}).zone();
     }
 
     isOwner(party: Party): boolean {

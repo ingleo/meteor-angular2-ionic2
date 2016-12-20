@@ -7,6 +7,7 @@ import { CanActivate } from '@angular/router';
 import 'rxjs/add/operator/map';
 import { Observable } from 'rxjs/Observable';
 import { InjectUser } from "angular2-meteor-accounts-ui";
+import { MouseEvent } from "angular2-google-maps/core";
 
 import { Parties } from '../../../../both/collections/parties.collection';
 import { Party } from '../../../../both/models/party.model';
@@ -14,10 +15,12 @@ import { Users } from '../../../../both/collections/users.collection';
 import { User } from '../../../../both/models/user.model';
 
 import template from './party-details.component.html';
+import style from './party-details.component.scss';
 
 @Component({
     selector: 'party-details',
-    template
+    template,
+    styles: [ style ]
 })
 
 @InjectUser('user')
@@ -29,6 +32,9 @@ export class PartyDetailsComponent implements OnInit, OnDestroy, CanActivate {
     users: Observable<User>;
     uninvitedSub: Subscription;
     user: Meteor.User;
+
+    centerLat: number = 37.4292;
+    centerLng: number = -122.1381;
 
     constructor(private route: ActivatedRoute) { }
 
@@ -125,6 +131,19 @@ export class PartyDetailsComponent implements OnInit, OnDestroy, CanActivate {
             return invited.indexOf(this.user._id) !== -1;
         }
         return false;
+    }
+
+    get lat(): number {
+        return this.party && this.party.location.lat;
+    }
+
+    get lng(): number {
+        return this.party && this.party.location.lng;
+    }
+
+    mapClicked($event: MouseEvent) {
+        this.party.location.lat = $event.coords.lat;
+        this.party.location.lng = $event.coords.lng;
     }
 
     ngOnDestroy() {
