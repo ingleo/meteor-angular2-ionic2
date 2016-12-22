@@ -23,7 +23,8 @@ import { MaterialModule } from "@angular/material";
         AccountsModule,
         AgmCoreModule.forRoot({
             apiKey: 'AIzaSyAWoBdZHCNh5R-hB5S5ZZ2oeoYyfdDgniA'
-        })
+        }),
+        MaterialModule.forRoot()
     ],
     declarations: [
         AppComponent,

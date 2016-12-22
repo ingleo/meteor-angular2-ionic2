@@ -5,10 +5,12 @@ import { InjectUser } from 'angular2-meteor-accounts-ui';
 
 import { Parties } from '../../../../both/collections/parties.collection';
 import template from './parties-form.component.html';
+import style from './parties-form.component.scss';
 
 @Component({
     selector: 'parties-form',
-    template
+    template,
+    styles: [style]
 })
 
 //injects a user property
@@ -17,8 +19,13 @@ export class PartiesFormComponent implements OnInit {
 
     user: Meteor.User;
     addForm: FormGroup;
+    newPartyPosition: { lat: number, lng: number } = { lat: 37.4292, lng: -122.1381 };
 
     constructor(private formBuilder: FormBuilder) { }
+
+    mapClicked($event) {
+        this.newPartyPosition = $event.coords;
+    }
 
     ngOnInit() {
         console.log(this.user);
@@ -47,7 +54,9 @@ export class PartiesFormComponent implements OnInit {
                 name: this.addForm.value.name,
                 description: this.addForm.value.description,
                 location: {
-                    name: this.addForm.value.location
+                    name: this.addForm.value.location,
+                    lat: this.newPartyPosition.lat,
+                    lng: this.newPartyPosition.lng
                 },
                 public: this.addForm.value.public,
                 owner: Meteor.userId()
