@@ -12,6 +12,7 @@ import { SHARED_DECLARATIONS } from './shared';
 import { APP_BASE_HREF } from '@angular/common';
 import { AgmCoreModule } from 'angular2-google-maps/core';
 import { MaterialModule } from "@angular/material";
+import { AUTH_DECLARATIONS } from "./auth/index";
 
 @NgModule({
 
@@ -29,7 +30,8 @@ import { MaterialModule } from "@angular/material";
     declarations: [
         AppComponent,
         ...PARTIES_DECLARATIONS,
-        ...SHARED_DECLARATIONS
+        ...SHARED_DECLARATIONS,
+        ...AUTH_DECLARATIONS
     ],
     providers: [
         ...ROUTES_PROVIDERS,
